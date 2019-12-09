@@ -1,19 +1,27 @@
 import os, pickle
+from glob import iglob
 
 data_folder = os.getcwd() + os.path.sep + "smashers" + os.path.sep
 
-class Scheduler:
+class Manager:
     """Pings discord users when tournament is open"""
 
-    def __init__(self, smashers: dict, tournamet: str):
-        self.smashers  = smashers
+    def __init__(self, tournamet: str):
+        self.smashers  = {}
         self.tournamet = tournament
+
+        # reads in all enrolled users on startup
+        # files are named after user discord id
+        for smasher_file in iglob(data_folder + '*'):
+            with open(smasher_file, 'rb') as f:
+                # only include discord id as key, not whole path
+                self.smashers[smasher_file[smasher_file.rfind(os.path.sep)]+len(os.path.sep):] = pickle.load(f)
 
     def prompt_smashers(self, match_name):
         """
         This is called when a new tournament is ready
 
-        Messages all registered smashers 
+        Messages all enrolled smashers 
         """
         for _, smasher in smashers.items():
             smasher.prompt(match_name)
@@ -31,13 +39,14 @@ class Scheduler:
 
         # check if already exists
         if disc_id in self.smashers:
-            return "You are already registered as {}!".format(smashers[disc_id])
+            return "You are already registered as {}!".format(smashers[disc_id].uname)
 
         new_smasher = new Smasher(disc_id, uname)
         with open(data_folder + disc_id, 'wb') as f:
             pickle.dump(new_smasher, f)
 
         self.smashers[disc_id] = new_smasher
+        # TODO: log
         return "You are now registered as {}".format(uname)
 
     def remove_smasher(self, disc_id):
@@ -49,8 +58,18 @@ class Scheduler:
 
         self.smashers.pop(disc_id, None)
 
+        # TODO: log
+
         return "You have been removed from the record"
 
-    async def register(self, disc_id):
-        """Called when smasher responds with !yes to prompt"""
-        self.smashers[disc_id].register(tourny_link)
+    async def register(self, disc_id, tourny_id, tourny_name):
+        """Called when smasher messages !register to Atilla"""
+
+        # register user in braaket
+        # TODO: nav to braaket user entry page
+        # TODO: check if user already in braaket
+        # TODO: if not, register user
+
+        # TODO: log
+
+        message(disc_id, f"You have been registered for {tourny_name}")
